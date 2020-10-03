@@ -1,0 +1,90 @@
+<%- include("partials/header"); -%>
+<div class="container-fluid">
+	<form action="/do-post" onsubmit="return doPost(this);" method="post">
+<div class="form-group">
+	<label for="">Title</label>
+	<input type="text" placeholder="Title" name="title" class="form-control">
+</div>
+<!-- Button trigger modal -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal" type="button">
+	Upload a photo
+</button>
+<div class="form-group">
+	<label for="">Content</label>
+	<textarea name="content" class="form-control" id="" cols="30" rows="10"></textarea>
+</div>
+<input type="submit" class="btn btn-info" value="Post">
+	</form>
+</div>
+ <script>
+	 function doPost(form){
+		 $.ajax({
+		 url: "/do-post",
+		 method: "POST",
+		 data : {title: form.title.value, content: form.content.value},
+		 success: function(response) {
+			alert(response);
+		 }
+		 });
+		 return false;
+	 }
+ </script>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel">
+					Upload An Image
+				</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+			</div>
+
+			<div class="modal-body">
+				<form action="/do-upload-image" enctype="multipart/form-data" id="form-upload" method="post">
+					<div class="form-group">
+						<input type="file" name="file" class="form-control">
+					</div>
+					<input type="submit" class="btn btn-success" value="Upload">
+				</form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+
+				<button type="button" class="btn btn-primary">
+					Submit changes
+				</button>
+			</div>
+
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+
+</div><!-- /.modal -->
+
+<script>
+	$("#form-upload").on('submit', (e) => {
+		e.preventDefault();
+		$.ajax({
+			url: "/do-upload-image",
+			method: "POST",
+			data: new FormData(this),
+			contentType: false,
+			cache:false,
+			processData: false,
+			success: function (response){
+				alert(response);
+			}
+		});
+	});
+</script>
+
+
+<%- include("partials/footer"); -%>
