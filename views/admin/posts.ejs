@@ -1,14 +1,17 @@
 <%- include("partials/header"); -%>
 <div class="container-fluid">
-	<form action="/do-post" onsubmit="return doPost(this);" method="post">
+	<form action="/do-post" onsubmit="return doPost(this);" method="POST">
 <div class="form-group">
 	<label for="">Title</label>
 	<input type="text" placeholder="Title" name="title" class="form-control">
 </div>
+
 <!-- Button trigger modal -->
 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" type="button">
-	Upload a photo
+	Upload An Image
 </button>
+
+
 <div class="form-group">
 	<label for="">Content</label>
 	<textarea name="content" class="form-control" id="" cols="30" rows="10"></textarea>
@@ -17,19 +20,23 @@
 	</form>
 </div>
  <script>
+
 	 function doPost(form){
+		 var formData = {title: form.title.value, content: form.content.value, image: imagePath};
 		 $.ajax({
 		 url: "/do-post",
 		 method: "POST",
-		 data : {title: form.title.value, content: form.content.value},
+		 data : formData,
 		 success: function(response) {
-			alert(response);
+			alert(response.text);
+			formData._id = response._id;
+			var socket = io();
+			socket.emit("new_post", formData);
 		 }
 		 });
 		 return false;
 	 }
  </script>
-
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 
@@ -37,16 +44,17 @@
 		<div class="modal-content">
 
 			<div class="modal-header">
+
 				<h4 class="modal-title" id="myModalLabel">
 					Upload An Image
 				</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-					&times;
+					×
 				</button>
 			</div>
 
 			<div class="modal-body">
-				<form action="/do-upload-image" enctype="multipart/form-data" id="form-upload" method="post">
+				<form method="POST" enctype="multipart/form-data" id="form-upload">
 					<div class="form-group">
 						<input type="file" name="file" class="form-control">
 					</div>
@@ -54,23 +62,15 @@
 				</form>
 			</div>
 
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">
-					Close
-				</button>
-
-				<button type="button" class="btn btn-primary">
-					Submit changes
-				</button>
-			</div>
+			
 
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 
 </div><!-- /.modal -->
-
 <script>
-	$("#form-upload").on('submit', (e) => {
+	var imagePath = "";
+	$("#form-upload").on("submit", function(e) {
 		e.preventDefault();
 		$.ajax({
 			url: "/do-upload-image",
@@ -80,7 +80,8 @@
 			cache:false,
 			processData: false,
 			success: function (response){
-				alert(response);
+				imagePath = response;
+				$("#myModal").modal("hide");
 			}
 		});
 	});
