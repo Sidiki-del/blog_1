@@ -2,11 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const ObjectID = require('mongodb').ObjectID;
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 const formidable = require('formidable');
 const fs = require('fs');
 
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+
 const session = require('express-session');
 app.use(
   session({
@@ -100,7 +101,10 @@ MongoClient.connect(
                    "comments": {username: req.body.username, comment: req.body.comment}
                }
            }, function(error, post){
-               res.send('Comment Display Successfully !!!');
+               res.send({
+                   text: 'Comment Display Successfully !!!',
+                   _id: post.insertedId
+               });
            });
        });
 
@@ -121,6 +125,9 @@ MongoClient.connect(
            socket.on("new_post", function(formData){
                console.log(formData);
                socket.broadcast.emit("new_post", formData);
+           });
+           socket.on("new_comment", function(comment){
+               io.emit("new_comment", comment);
            });
        });
 
