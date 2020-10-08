@@ -19,10 +19,7 @@
     <!-- add to the initial form -->
     <div id="posts"> 
     <% posts.forEach(function(post){ %> 
-     <script>
-       var socket = io();
-       socket.on("new_post", function (formData) {
-         var html = "";
+     
      html += '<div class="card mb-4">';
        html += '<div class="card-body">';
          html += '<div class="row">';
@@ -57,7 +54,7 @@
     // </ul> 
 
    html += '</div>';
-   html += '</div>';
+   html += ' ';
    $("#posts").prepend(html);
 });
   
