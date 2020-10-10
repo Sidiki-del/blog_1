@@ -34,7 +34,7 @@
           </div>
           <div class="col-lg-6">
             <h2 class="card-title"><%= post.title  %></h2>
-            <p class="card-text"><%= post.content  %></p>
+            <p class="card-text"><%= post.content %></p>
             <a href="admin/posts/<%= post._id %>" class="btn btn-primary">Read More &rarr;</a>
           </div>
         </div>
@@ -71,7 +71,7 @@
                      
                       html += '<img class="img-fluid rounded" src="'+ formData.image +'" alt="">';
 
-                    html += '</a>';
+                    html += '</a>'; 
                   html += '</div>';
                   html += '<div class="col-lg-6">';
                     html += '<h2 class="card-title">formData.title</h2>';

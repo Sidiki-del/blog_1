@@ -91,19 +91,42 @@ MongoClient.connect(
            blog.collection("posts").insertOne(req.body, function(error, document){
                res.send({
                    text: "Posted Successfully !!!",
-                   _id: document.insertedId
+                   _id: document.insertedId 
                });
            });
        });
        app.post('/do-comment', function(req, res){
-           blog.collection("posts").update({"_id": ObjectID(req.body.post_id)}, {
+           var comment_id = ObjectID();
+           blog.collection("posts").updateOne({"_id": ObjectID(req.body.post_id)}, {
                $push: {
-                   "comments": {username: req.body.username, comment: req.body.comment}
+                   "comments": {_id: comment_id, username: req.body.username, comment: req.body.comment, email: req.body.email}
                }
            }, function(error, post){
                res.send({
                    text: 'Comment Display Successfully !!!',
                    _id: post.insertedId
+               });
+           });
+       });
+
+       app.post('/do-reply', function(req, res){
+           var reply_id = ObjectID();
+           blog.collection("posts").updateOne(
+               {
+               "_id": ObjectID(req.body.post_id),
+               "comments._id": ObjectID(req.body.comment_id)
+           }, {
+               $push:{
+                   "comments.$.replies":{
+                       _id: reply_id,
+                       name: req.body.name,
+                       reply: req.body.reply
+                   }
+               }
+           }, function(error, document){
+               res.send({
+                   text: "Replied Successfully !!!",
+                   _id: reply_id
                });
            });
        });
