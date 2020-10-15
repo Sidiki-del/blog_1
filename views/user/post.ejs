@@ -103,7 +103,8 @@
                    post_id: form.post_id.value,
                    comment_id: form.comment_id.value,
                    name: form.name.value,
-                   reply: form.reply.value
+                   reply: form.reply.value,
+                   comment_email: form.comment_email.value
                  };
                  $.ajax({
                    url: "/do-reply", 
@@ -146,6 +147,8 @@
               <form action="/do-reply" onsubmit="return doReply(this);" method="POST">
                 <input type="hidden" name="post_id" value="<%= post._id  %>">
                 <input type="hidden" name="comment_id" value="<%= comment._id  %>">
+                <input type="hidden" name="comment_email" value="<%= comment.email  %>">
+
                 <div class="form-group">
                    <input class="form-control" name="name" placeholder="Your Name">
                 </div>

@@ -1,4 +1,5 @@
 const express = require('express');
+const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const app = express();
 const ObjectID = require('mongodb').ObjectID;
@@ -15,7 +16,7 @@ app.use(
     secret: "any random String", 
     // proxy: true,
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true 
   })
 ); 
 
@@ -124,9 +125,24 @@ MongoClient.connect(
                    }
                }
            }, function(error, document){
-               res.send({
+               var transporter = nodemailer.createTransport({
+                   "service": "gmail",
+                   "auth": {
+                       "user": "sidikiissadiarra@gmail.com",
+                       "pass": "123b@ligou"
+                   }
+               });
+               var mailOptions = {
+                   "from": "My Blog",
+                   "to": req.body.comment_email,
+                   "subject" : "New Reply",
+                   "text":req.body.name + "has replied to your comment.http://localhost:3000/posts/" + req.body.post_id 
+               };
+               transporter.sendMail(mailOptions, function(error, info){
+                   res.send({
                    text: "Replied Successfully !!!",
                    _id: reply_id
+               });
                });
            });
        });

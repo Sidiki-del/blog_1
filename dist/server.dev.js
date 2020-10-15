@@ -2,6 +2,8 @@
 
 var express = require('express');
 
+var nodemailer = require('nodemailer');
+
 var bodyParser = require('body-parser');
 
 var app = express();
@@ -133,9 +135,24 @@ MongoClient.connect("mongodb://localhost:27017", {
         }
       }
     }, function (error, document) {
-      res.send({
-        text: "Replied Successfully !!!",
-        _id: reply_id
+      var transporter = nodemailer.createTransport({
+        "service": "gmail",
+        "auth": {
+          "user": "sidikiissadiarra@gmail.com",
+          "pass": "123b@ligou"
+        }
+      });
+      var mailOptions = {
+        "from": "My Blog",
+        "to": req.body.comment_email,
+        "subject": "New Reply",
+        "text": req.body.name + "has replied to your comment.http://localhost:3000/posts/" + req.body.post_id
+      };
+      transporter.sendMail(mailOptions, function (error, info) {
+        res.send({
+          text: "Replied Successfully !!!",
+          _id: reply_id
+        });
       });
     });
   });
