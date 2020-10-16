@@ -175,6 +175,9 @@ MongoClient.connect("mongodb://localhost:27017", {
     socket.on("new_comment", function (comment) {
       io.emit("new_comment", comment);
     });
+    socket.on("new_reply", function (reply) {
+      io.emit("new_reply", reply);
+    });
   });
   http.listen(3000, function () {
     console.log('Server is running on port 3000');

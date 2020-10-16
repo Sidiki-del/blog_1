@@ -130,7 +130,7 @@ MongoClient.connect(
                    "auth": {
                        "user": "sidikiissadiarra@gmail.com",
                        "pass": "123b@ligou"
-                   }
+                   } 
                });
                var mailOptions = {
                    "from": "My Blog",
@@ -167,6 +167,9 @@ MongoClient.connect(
            });
            socket.on("new_comment", function(comment){
                io.emit("new_comment", comment);
+           });
+           socket.on("new_reply", function(reply){
+               io.emit("new_reply", reply);
            });
        });
 

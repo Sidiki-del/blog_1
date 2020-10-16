@@ -98,6 +98,23 @@
                $("#comments").prepend(html);
                 });
 
+                socket.on("new_reply", function(reply){
+                 var html = "";
+                 $("#replies-" + reply.comment_id).append(html);
+
+                  html += '<div class="media mb-4">';
+                html += '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">';
+                 html += '<div class="media-body">';
+                  html += '<h5 class="mt-0">';
+                      html += reply.name  ;
+                      html += '</h5>';
+                  html += reply.reply ;
+                html += '</div>';
+               html += ' </div>';
+               
+
+                });
+ 
                function doReply(form){
                  var formData = {
                    post_id: form.post_id.value,
@@ -111,6 +128,12 @@
                    method: "POST",
                    data: formData,
                    success: function(response){
+                     formData._id = response._id;
+                     socket.emit("new_reply", formData);
+
+                     form.name.value = "";
+                     form.reply.value = "";
+
                      alert(response.text);
                    }
                  });
@@ -129,6 +152,8 @@
             <h5 class="mt-0"> <%= comment.username  %></h5>
             <%= comment.comment  %>
 
+            <div id="replies-<%= comment._id  %>">
+
             <% if(comment.replies){  %>
               <% comment.replies.forEach(function(reply){  %>
                 <div class="media mb-4">
@@ -142,7 +167,7 @@
 
                 <% });  %>
             <% }  %>
-
+            </div>
             <div class="col-md-3">
               <form action="/do-reply" onsubmit="return doReply(this);" method="POST">
                 <input type="hidden" name="post_id" value="<%= post._id  %>">
