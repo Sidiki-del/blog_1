@@ -1,0 +1,44 @@
+<%- include("partials/header"); -%>
+
+<div class="container-fluid">
+	<form action="/do-edit-post" onsubmit="return doEditPost(this);" method="POST">
+<div class="form-group">
+	<label for="">Title</label>
+	<input type="text" placeholder="Title" name="title" value="<%= post.title  %> " class="form-control">
+</div>
+
+<!-- Button trigger modal -->
+<!-- <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" type="button">
+	Upload An Image
+</button> -->
+
+
+<div class="form-group">
+	<label for="">Content</label>
+	<textarea name="content" class="form-control" id="" cols="30" rows="10"><%= post.content  %></textarea>
+</div>
+<input type="submit" class="btn btn-warning" value="Edit">
+    </form>
+</div>
+
+
+<script>
+
+    var postId = '<%= post._id  %>';
+
+	 function doEditPost(form){
+		 var formData = {title: form.title.value, content: form.content.value, _id: postId};
+		 $.ajax({
+		 url: "/do-edit-post",
+		 method: "POST",
+		 data : formData,
+		 success: function(response) {
+			alert(response);
+			
+		 }
+		 });
+		 return false;
+	 }
+ </script>
+
+<%- include("partials/footer"); -%>

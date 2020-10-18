@@ -64,7 +64,11 @@ MongoClient.connect("mongodb://localhost:27017", {
   });
   app.get("/admin/posts", function (req, res) {
     if (req.session.admin) {
-      res.render("admin/posts");
+      blog.collection("posts").find().toArray(function (error, posts) {
+        res.render("admin/posts", {
+          "posts": posts
+        });
+      });
     } else {
       res.redirect("/admin");
     }
@@ -79,6 +83,30 @@ MongoClient.connect("mongodb://localhost:27017", {
       }
 
       res.send(admin);
+    });
+  });
+  app.get("/posts/edit/:id", function (req, res) {
+    //   if(req.session.admin){
+    blog.collection("posts").findOne({
+      "_id": ObjectID(req.params.id)
+    }, function (error, post) {
+      res.render("admin/edit_post", {
+        "post": post
+      });
+    }); //        }else{
+    //       res.redirect("/admin");
+    //   }
+  });
+  app.post("/do-edit-post", function (req, res) {
+    blog.collection("posts").updateOne({
+      "_id": ObjectID(req.body._id)
+    }, {
+      $set: {
+        "title": req.body.title,
+        "content": req.body.content
+      }
+    }, function (error, post) {
+      res.send('Updated Successfully !!');
     });
   });
   app.get('/admin', function (req, res) {

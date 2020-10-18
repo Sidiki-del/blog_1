@@ -18,6 +18,26 @@
 </div>
 <input type="submit" class="btn btn-info" value="Post">
 	</form>
+	<table class="table">
+		<tr>
+			<th>Title</th>
+			<th>Image</th>
+			<th>Content</th>
+			<th>Action</th>
+		</tr>
+		<% posts.forEach(function (post){ %> 
+			<tr>
+				<td><%= post.title %></td>
+				<td>
+					<img src="<%= post.image %>" width="200px" alt="" srcset="">
+				</td>
+				<td><%= post.content %></td>
+				<td> <a href="/posts/edit/<%= post._id %>" class="btn btn-warning btn-sm">Edit</a> </td>
+				
+			</tr>
+		<% }) %> 
+
+	</table>
 </div>
  <script>
 
