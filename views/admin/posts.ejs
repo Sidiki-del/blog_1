@@ -32,7 +32,10 @@
 					<img src="<%= post.image %>" width="200px" alt="" srcset="">
 				</td>
 				<td><%= post.content %></td>
-				<td> <a href="/posts/edit/<%= post._id %>" class="btn btn-warning btn-sm">Edit</a> </td>
+				<td> 
+					<a href="/posts/edit/<%= post._id %>" class="btn btn-warning btn-sm">Edit</a>
+					<button type="button" class="btn btn-sm btn-danger" onclick="doDelete('<%= post._id %>','<%= post.image %>');">Delete</button>
+			    </td>
 				
 			</tr>
 		<% }) %> 
@@ -40,6 +43,23 @@
 	</table>
 </div>
  <script>
+	 function doDelete(postId, image){
+		 if(confirm("Are you sure you wanna delete?")){
+		 $.ajax({
+			 url: "/do-delete",
+			 method: "POST",
+			 data: {
+				 "_id": postId,
+				 "image": image
+			 },
+			  success: function(response){
+				  var socket = io();
+				  socket.emit("delete_post", postId);
+					 alert(response);
+				 }
+		 });
+		 }
+	 }
 
 	 function doPost(form){
 		 var formData = {title: form.title.value, content: form.content.value, image: imagePath};

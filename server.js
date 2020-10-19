@@ -101,7 +101,8 @@ MongoClient.connect(
            }, {
                $set: {
                    "title": req.body.title,
-                   "content": req.body.content
+                   "content": req.body.content,
+                   "image": req.body.image
                }
            }, function(error, post){
                res.send('Updated Successfully !!');
@@ -142,6 +143,22 @@ MongoClient.connect(
            });
        });
 
+       app.post('/do-delete', function(req, res){
+        //    if(req.session.admin){
+               fs.unlink(req.body.image.replace("/", ""), function(error){
+                   blog.collection("posts").deleteOne({
+                       "_id": ObjectID(req.body._id)
+                   }, function(error, document){
+                       res.send("Deleted");
+                   });
+               });
+
+        //    }else{
+        //        res.redirect('/admin');
+        //    }
+
+       });
+
        app.post('/do-reply', function(req, res){
            var reply_id = ObjectID();
            blog.collection("posts").updateOne(
@@ -180,8 +197,21 @@ MongoClient.connect(
        });
 
      
-       app.post("/do-upload-image", function(req, res){
+       app.post("/do-update-image", function(req, res){
            var formData = new formidable.IncomingForm();
+           formData.parse(req, function(error, fields, files){
+               fs.unlink(fields.image.replace("/", ""), function(error){
+                   var oldPath = files.file.path;
+               var newPath = "static/images/" + files.file.name;
+               fs.rename(oldPath, newPath, function(err){
+                   res.send("/" + newPath);
+               });
+               });
+           });
+       });
+
+       app.post('/do-upload-image', function(req, res){
+            var formData = new formidable.IncomingForm();
            formData.parse(req, function(error, fields, files){
                var oldPath = files.file.path;
                var newPath = "static/images/" + files.file.name;
@@ -190,6 +220,8 @@ MongoClient.connect(
                });
                
            });
+
+
        });
 
        io.on("connection", function(socket){
@@ -203,6 +235,9 @@ MongoClient.connect(
            });
            socket.on("new_reply", function(reply){
                io.emit("new_reply", reply);
+           });
+           socket.on("delete_post", function(replyId){
+               socket.broadcast.emit("delete_post", replyId);
            });
        });
 

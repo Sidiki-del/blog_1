@@ -18,7 +18,7 @@
     <!-- Blog Post -->
     <div id="posts">
     <% posts.forEach(function(post){ %> 
-    <div class="card mb-4">
+    <div class="card mb-4" id="post-<%= post._id %>">
       <div class="card-body">
         <div class="row">
           <div class="col-lg-6">
@@ -61,6 +61,9 @@
   <!-- /.container -->
   <script>
     var socket = io();
+    socket.on("delete_post", function(replyId){
+      document.getElementById("post-" + replyId).deleteOne();
+    });
     socket.on("new_post", function (formData) {
           var html = "";
             html += '<div class="card mb-4">';
