@@ -1,0 +1,93 @@
+<%- include("partials/header"); -%>
+
+<div class="container-fluid">
+	<form action="/do-edit-post" onsubmit="return doEditPost(this);" method="POST">
+<div class="form-group">
+	<label for="">Title</label>
+	<input type="text" placeholder="Title" name="title" value="<%= post.title  %> " class="form-control">
+</div>
+
+<!-- Button trigger modal -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal" type="button">
+	Update An Image
+</button>
+
+
+<div class="form-group">
+	<label for="">Content</label>
+	<textarea name="content" class="form-control" id="" cols="30" rows="10"><%= post.content  %></textarea>
+</div>
+<input type="submit" class="btn btn-warning" value="Edit">
+    </form>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+
+				<h4 class="modal-title" id="myModalLabel">
+					Upload An Image
+				</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+			</div>
+
+			<div class="modal-body">
+                <form method="POST" enctype="multipart/form-data" id="form-upload">
+                    
+                    <input type="hidden" name="image" value="<%= post.image %>">
+					<div class="form-group">
+						<input type="file" name="file" class="form-control">
+					</div>
+					<input type="submit" class="btn btn-success" value="Upload">
+				</form>
+			</div>
+
+			
+
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+
+</div><!-- /.modal -->
+
+
+<script>
+
+    var postId = '<%= post._id  %>';
+    var image = '<%= post.image %>';
+
+	 function doEditPost(form){
+		 var formData = {title: form.title.value, content: form.content.value, _id: postId, image: image};
+		 $.ajax({
+		 url: "/do-edit-post",
+		 method: "POST",
+         data : formData,
+         
+		 success: function(response) {
+			alert(response);
+			
+		 }
+		 });
+		 return false;
+     }
+     $("#form-upload").on("submit", function(e) {
+		e.preventDefault();
+		$.ajax({
+			url: "/do-update-image",
+			method: "POST",
+			data: new FormData(this),
+			contentType: false,
+			cache:false,
+			processData: false,
+			success: function (response){
+				image = response;
+				$("#myModal").modal("hide");
+			}
+		});
+	});
+ </script>
+
+<%- include("partials/footer"); -%>

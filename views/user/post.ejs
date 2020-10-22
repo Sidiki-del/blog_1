@@ -51,6 +51,9 @@
                 <input type="text" name="username" class="form-control" placeholder="username">
               </div>
               <div class="form-group">
+                <input type="email" name="email" class="form-control" placeholder="email">
+              </div>
+              <div class="form-group">
                 <textarea name="comment" class="form-control" rows="3" placeholder="Comment"></textarea>
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
@@ -63,8 +66,9 @@
             var formData = {
             username: form.username.value,
             comment: form.comment.value,
-            post_id: form.post_id.value
-            }
+            post_id: form.post_id.value,
+             email: form.email.value
+            };
             $.ajax({
               url: "/do-comment",
               method: "POST",
@@ -92,9 +96,49 @@
               html += '</div>';
               html += '</div>';
                $("#comments").prepend(html);
+                });
 
-          });
-          
+                socket.on("new_reply", function(reply){
+                 var html = "";
+                 $("#replies-" + reply.comment_id).append(html);
+
+                  html += '<div class="media mb-4">';
+                html += '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">';
+                 html += '<div class="media-body">';
+                  html += '<h5 class="mt-0">';
+                      html += reply.name  ;
+                      html += '</h5>';
+                  html += reply.reply ;
+                html += '</div>';
+               html += ' </div>';
+               
+
+                });
+ 
+               function doReply(form){
+                 var formData = {
+                   post_id: form.post_id.value,
+                   comment_id: form.comment_id.value,
+                   name: form.name.value,
+                   reply: form.reply.value,
+                   comment_email: form.comment_email.value
+                 };
+                 $.ajax({
+                   url: "/do-reply", 
+                   method: "POST",
+                   data: formData,
+                   success: function(response){
+                     formData._id = response._id;
+                     socket.emit("new_reply", formData);
+
+                     form.name.value = "";
+                     form.reply.value = "";
+
+                     alert(response.text);
+                   }
+                 });
+                 return false;
+               }
         </script>
 
         <!-- Single Comment -->
@@ -107,6 +151,39 @@
           <div class="media-body">
             <h5 class="mt-0"> <%= comment.username  %></h5>
             <%= comment.comment  %>
+
+            <div id="replies-<%= comment._id  %>">
+
+            <% if(comment.replies){  %>
+              <% comment.replies.forEach(function(reply){  %>
+                <div class="media mb-4">
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                 <div class="media-body">
+                  <h5 class="mt-0"> <%= reply.name  %></h5>
+                  <%= reply.reply  %>
+                </div>
+                </div>
+               
+
+                <% });  %>
+            <% }  %>
+            </div>
+            <div class="col-md-3">
+              <form action="/do-reply" onsubmit="return doReply(this);" method="POST">
+                <input type="hidden" name="post_id" value="<%= post._id  %>">
+                <input type="hidden" name="comment_id" value="<%= comment._id  %>">
+                <input type="hidden" name="comment_email" value="<%= comment.email  %>">
+
+                <div class="form-group">
+                   <input class="form-control" name="name" placeholder="Your Name">
+                </div>
+                 <div class="form-group">
+                   <textarea name="reply" class="form-control" id="" cols="30" rows="5"  placeholder="Your Reply"></textarea>
+                 
+                </div>
+                <input type="submit" class="btn btn-info btn-sm" value="Reply">
+              </form>
+            </div>
           </div>
         </div>
         <%  })%>

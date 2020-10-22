@@ -24,6 +24,7 @@
     "express-session": "^1.17.1",
     "formidable": "^1.2.2",
     "mongodb": "^3.6.2",
+    "nodemailer": "^6.4.13",
     "socket.io": "^2.3.0"
   }
 }
