@@ -44,16 +44,27 @@ MongoClient.connect("mongodb://localhost:27017", {
   var blog = client.db('blog');
   console.log('DB Connected !! ');
   app.get("/", function (req, res) {
-    blog.collection("posts").find().toArray(function (error, posts) {
-      posts = posts.reverse();
-      res.render("user/home", {
-        posts: posts
+    blog.collection("settings").findOne({}, function (error, settings) {
+      var postLimit = parseInt(settings.post_limit);
+      blog.collection("posts").find().limit(postLimit).toArray(function (error, posts) {
+        posts = posts.reverse();
+        res.render("user/home", {
+          posts: posts,
+          "postLimit": postLimit
+        });
       });
     });
-    app.get('/do-logout', function (req, res) {
-      req.session.destroy();
-      res.redirect("/admin");
+  });
+  app.get('/get-posts/:start/:limit', function (req, res) {
+    blog.collection("posts").find().sort({
+      "_id": -1
+    }).skip(parseInt(req.params.start)).limit(parseInt(req.params.limit)).toArray(function (error, posts) {
+      res.send(posts);
     });
+  });
+  app.get('/do-logout', function (req, res) {
+    req.session.destroy();
+    res.redirect("/admin");
   });
   app.get('/admin/dashboard', function (req, res) {
     if (req.session.admin) {
@@ -72,6 +83,18 @@ MongoClient.connect("mongodb://localhost:27017", {
     } else {
       res.redirect("/admin");
     }
+  });
+  app.get('/admin/settings', function (req, res) {
+    res.render('admin/settings');
+  });
+  app.post('/admin/save_settings', function (req, res) {
+    blog.collection("settings").update({}, {
+      "post_limit": req.body.post_limit
+    }, {
+      upsert: true
+    }, function (error, document) {
+      res.redirect('/admin/settings');
+    });
   });
   app.post('/do-admin-login', function (req, res) {
     blog.collection("admins").findOne({
