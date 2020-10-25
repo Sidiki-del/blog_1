@@ -1,3 +1,4 @@
+const env = require("dotenv").config({path: './config/.env'});
 const express = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
@@ -204,8 +205,8 @@ MongoClient.connect(
                var transporter = nodemailer.createTransport({
                    "service": "gmail",
                    "auth": {
-                       "user": "sidikiissadiarra@gmail.com",
-                       "pass": "123b@ligou"
+                       "user": "process.env.GMAIL_EMAIL",
+                       "pass": "process.env.GMAIL_PASS"
                    } 
                });
                var mailOptions = {
@@ -272,17 +273,6 @@ MongoClient.connect(
       http.listen(3000, function () {
           console.log('Server is running on port 3000');
       });
-  
-
-
-
-
-
-
-
-
-
-
       });
      
 
