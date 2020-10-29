@@ -54,22 +54,22 @@ MongoClient.connect(
 
       });
       app.get('/admin/dashboard', function (req, res) {
-          if(req.session.admin){
+        //   if(req.session.admin){
           res.render('admin/dashboard');
-          } else {
-              res.redirect("/admin");
-          }
+        //   } else {
+            //   res.redirect("/admin");
+        //   }
       });
        app.get("/admin/posts", function (req, res) { 
-           if (req.session.admin) {
+        //    if (req.session.admin) {
                blog.collection("posts").find().toArray(function(error, posts){
 
                res.render("admin/posts", {"posts": posts});
                
                })
-           } else {
-             res.redirect("/admin");
-           }
+        //    } else {
+        //      res.redirect("/admin");
+        //    }
        });
 
        app.post('/do-admin-login', function(req, res){
