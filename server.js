@@ -41,11 +41,52 @@ MongoClient.connect(
       var blog = client.db('blog');
       console.log('DB Connected !! ');
 
-      app.get("/", function (req, res) {
-          blog.collection("posts").find().toArray(function(error, posts){
-              posts = posts.reverse();
-          res.render("user/home", {posts: posts});
+
+       app.get('/admin/settings', function(req, res){
+           blog.collection("settings").findOne({}, function(error, settings){
+           res.render('admin/settings',
+            {
+               "post_limit": settings.post_limit
+           }
+           
+           );
+           })
+       });
+
+       
+       app.post('/admin/save_settings', function(req, res){
+           blog.collection("settings").update({}, {
+               "post_limit": req.body.post_limit
+           }, {upsert: true}, function(error, document){
+               res.redirect('/admin/settings');
+           });
+       });
+       
+       app.get("/", function (req, res) {
+          blog.collection("settings").findOne({}, function(error, settings){
+              var postLimit = parseInt(settings.post_limit);
+              blog.collection("posts").find().sort({"_id": -1}).limit(postLimit).toArray(function(error, posts){
+            //   posts = posts.reverse();
+              res.render("user/home", {
+              posts: posts,
+              "postLimit": postLimit
+            
+            });
+          });
+           });
       });
+
+      app.get("/get-posts/:start/:limit", function(req, res){
+          blog.collection("posts").find().sort({"_id": -1}).skip(parseInt(req.params.start)).limit(parseInt(req.params.limit)).toArray(function(error, posts){
+              res.send(posts);
+          });
+      });
+
+    //   app.get("/", function (req, res) {
+    //       blog.collection("posts").find().toArray(function(error, posts){
+    //           posts = posts.reverse();
+    //       res.render("user/home", {posts: posts});
+    //   });
 
       app.get('/do-logout', function(req, res){
           req.session.destroy();
@@ -245,8 +286,8 @@ MongoClient.connect(
       http.listen(3000, function () {
           console.log('Server is running on port 3000');
       });
-  }
-);
+//   }
+// );
 
 
 

@@ -19,7 +19,7 @@
     <div id="posts">
     <% posts.forEach(function(post){ %> 
     <div class="card mb-4" id="post-<%= post._id %>">
-      <div class="card-body">
+      <div class="card-body"> 
         <div class="row">
           <div class="col-lg-6">
             <a href="#">
@@ -44,7 +44,7 @@
         <a href="">Start Bootstrap</a>
       </div>
     </div>
-    <%  }) %>
+    <%  }); %>
     
 
     <!-- Pagination
@@ -56,10 +56,90 @@
         <a class="page-link" href="#">Newer &rarr;</a>
       </li>
     </ul> -->
+    <div class="row">
+      <div class="col-md-6">
+        <button type="button" class="btn btn-info" onclick="getPrevious();">
+          Previous
+        </button>
+      </div>
+      <div class="col-md-6">
+        <button type="button" class="btn btn-info" style="float: right;" onclick="getNext();">
+          Next
+        </button>
+      </div>
+    </div> 
   </div>
   </div>
   <!-- /.container -->
   <script>
+
+    var limit = <%= postLimit %>;
+    var start = 0;
+
+    function getNext(){
+      start = start + limit;
+      $.ajax({
+        url: "/get-posts/"+ start + "/" + limit,
+        method: "GET",
+        success: function(response){
+          // console.log(response);
+          renderPosts(response);
+        }
+      });
+
+    }
+    
+    function getPrevious(){
+      start = start - limit;
+      $.ajax({
+        url: "/get-posts/"+ start + "/" + limit,
+        method: "GET",
+        success: function(response){
+          // console.log(response);
+          renderPosts(response);
+        }
+      });
+
+    }
+
+
+    
+    function renderPosts(posts){
+      if(length.posts > 0){
+        var html = "";
+        for(var a = 0; a < posts.length; a++){
+          html += ' <div class="card mb-4" id="post-' + posts[a]._id +'">';
+     html += ' <div class="card-body">';
+        html += '<div class="row">';
+         html += ' <div class="col-lg-6">';
+           html += ' <a href="#">';
+            
+               html += ' <img class="img-fluid rounded" src="' + posts[a].image +'" alt="">';
+ 
+            
+            html += '</a>';
+          html += '</div>';
+         html += ' <div class="col-lg-6">';
+           html += ' <h2 class="card-title">';
+             html += posts[a].title;
+             html += '</h2>';
+           html += ' <p class="card-text">';
+             html +=  posts[a].content;
+              html +='</p>';
+            html += '<a href="admin/posts/'+ posts[a]._id +'" class="btn btn-primary">Read More &rarr;</a>';
+          html += '</div>';
+       html += ' </div>';
+      html += '</div>';
+      html += '<div class="card-footer text-muted">';
+       html += ' Posted on January 1, 2017 by';
+       html += ' <a href="">Start Bootstrap</a>';
+      html += '</div>';
+   html += ' </div>';
+        }
+        $("#posts").html(html);
+      }
+    }
+
     var socket = io();
     socket.on("delete_post", function(replyId){
       document.getElementById("post-" + replyId).deleteOne();
@@ -89,7 +169,7 @@
               html += '</div>';
             html += '</div>';
              $("#posts").prepend(html);
-          
+              });
   </script>
 		<%- include("partials/footer"); -%>
 
